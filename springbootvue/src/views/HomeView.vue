@@ -16,7 +16,7 @@
       <el-table-column prop="level" label="班级"/>
       <el-table-column prop="createTime" label="创建时间"/>
       <el-table-column prop="updateTime" label="修改时间"/>
-      <el-table-column fixed="right" label="操作" width="120">
+      <el-table-column fixed="right" label="操作" width="160">
         <template #default="scope">
           <el-button link type="primary" @click="handleEdit(scope.row)">编辑</el-button>
 
@@ -25,6 +25,15 @@
               <el-button type="text" >删除</el-button>
             </template>
           </el-popconfirm>
+
+          <el-upload
+              class="upload-demo"
+              :http-request="uploadFile"
+              :multiple="false"
+              :on-change="handleChange">
+            <el-button link type="primary">点击上传</el-button>
+          </el-upload>
+
 
         </template>
       </el-table-column>
@@ -160,6 +169,35 @@ export default {
         return '女';
       }
     },
+    handleChange() {
+      console.log(11111)
+    },
+    uploadFile(params){
+      console.log('文件上传测试')
+      let fd = new FormData();
+      fd.append('file', params.file);
+      fd.append('name', params.file.name);
+     request.post('/file/upload',fd, {
+        headers:{
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(res=>{
+        if (res.code == "0"){
+          this.dialogVisible=false
+          this.$message({
+            type:"success",
+            message:"上传成功"
+          })
+        }else{
+          this.$message({
+            type:"fail",
+            message:"上传失败"
+          })
+        }
+
+      })
+    }
+    ,
     removeCurrent(id){
       request.delete("/student/"+ id).then(res => {
         if (res.code == "0"){
