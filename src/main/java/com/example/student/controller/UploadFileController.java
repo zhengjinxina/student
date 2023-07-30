@@ -3,6 +3,7 @@ package com.example.student.controller;
 import com.example.student.common.Result;
 import com.example.student.mapper.ScoreMapper;
 import com.example.student.service.UploadRecordService;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,8 +26,9 @@ public class UploadFileController {
     @Resource
     private UploadRecordService uploadService;
 
+    @CrossOrigin
     @PostMapping(value = "/upload")
-    public Result upload(MultipartFile file) {
+    public Result<?> upload(MultipartFile file) {
         return uploadService.upload(file);
     }
 
