@@ -10,7 +10,6 @@
     </div>
 
     <el-table :data="tableData" border style="width: 100%">
-      <!--      <el-table-column prop="id" label="id" width="180"/>-->
       <el-table-column prop="name" label="姓名" width="180"/>
       <el-table-column prop="sex" :formatter="gssex" label="性别"/>
       <el-table-column prop="level" label="班级"/>
@@ -25,15 +24,6 @@
               <el-button type="text">删除</el-button>
             </template>
           </el-popconfirm>
-
-
-          <el-upload
-              class="upload-demo"
-              action="http://localhost:8089/file/upload"
-              :multiple="false"
-              :on-success="handleChange">
-            <el-button link type="primary">点击上传</el-button>
-          </el-upload>
 
 
         </template>
@@ -93,12 +83,26 @@
                          :label="item.label"></el-option>
             </el-select>
           </el-form-item>
+
           <el-form-item label="班级">
             <el-select v-model="form.level" placeholder="请选择班级">
               <el-option label="1班" value="1班"/>
               <el-option label="2班" value="2班"/>
             </el-select>
           </el-form-item>
+
+          <el-form-item label="附件上传">
+            <el-upload
+                class="upload-demo"
+                action="http://localhost:8089/file/upload"
+                :multiple="false"
+                :file-list="fileList"
+                :on-success="handleChange">
+              <el-button link type="primary">点击上传</el-button>
+            </el-upload>
+          </el-form-item>
+
+
         </el-form>
 
         <template #footer>
@@ -134,6 +138,7 @@ export default {
       currentPage: 1,
       pageSize: 10,
       total: 0,
+      fileList:[],
       tableData: [],
       sexoption: [
         {
@@ -170,20 +175,12 @@ export default {
         return '女';
       }
     },
-    handleChange(file) {
-      console.log(file)
-
+    handleChange(res) {
+      this.form.url = res.data.address;
+      this.form.fileName = res.data.fileName;
+      console.log(this.form)
     },
 
-    uploadFile(file) {
-      let fd = new FormData();
-      fd.append('file', file);
-      request.post('/file/upload', file, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        }
-      })
-    },
     removeCurrent(id) {
       request.delete("/student/" + id).then(res => {
         if (res.code == "0") {

@@ -14,4 +14,6 @@ public class Student {
     private String createTime;
     private String updateTime;
     private String level;
+    private String fileName;
+    private String url;
 }

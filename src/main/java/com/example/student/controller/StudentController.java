@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.student.common.AwsS3Utils;
 import com.example.student.common.DateTool;
 import com.example.student.common.Result;
 import com.example.student.entity.Score;
@@ -12,6 +13,7 @@ import com.example.student.mapper.StudentMapper;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.sql.Wrapper;
 import java.util.Date;
 import java.util.List;

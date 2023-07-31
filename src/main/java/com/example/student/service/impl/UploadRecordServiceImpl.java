@@ -4,21 +4,19 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.PutObjectResult;
+import com.amazonaws.services.s3.model.*;
 import com.example.student.common.Result;
 import com.example.student.mapper.UploadMapper;
 import com.example.student.service.UploadRecordService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author ：ZGJ
@@ -34,12 +32,11 @@ public class UploadRecordServiceImpl implements UploadRecordService {
     @Resource
     private UploadMapper uploadMapper;
 
-    @Autowired
-    private AmazonS3 amazonS3;
+    @Value("${s3.file_bucket}")
+    private String fileBucket;
 
-    private String fileBucket = "l1";
-
-    private static String url = "1";
+    @Value("${s3.url}")
+    private String url;
 
 
     @Override
@@ -58,20 +55,23 @@ public class UploadRecordServiceImpl implements UploadRecordService {
         objectMetadata.setContentType(file.getContentType());
         objectMetadata.setContentLength(file.getSize());
         String key = System.currentTimeMillis() + fileName;
-
         final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(Regions.US_EAST_2).build();
 
         try {
-            s3.putObject(fileBucket, key, file.getInputStream(), objectMetadata);
-
+            //设置文件访问权限（可读）
+            s3.putObject(new PutObjectRequest(fileBucket,key,file.getInputStream(),objectMetadata).withCannedAcl(CannedAccessControlList.valueOf(CannedAccessControlList.PublicRead.name())));
         } catch (AmazonServiceException | IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
         //文件访问路径
-        String address = url + fileBucket + "/" + key;
+        String address = "https://" + fileBucket + ".s3.us-east-2.amazonaws.com/" + key;
+        //将一些关键数据返回到前端做保存用
+        Map<String, String> map = new HashMap();
+        map.put("address", address);
+        map.put("fileName", fileName);
         log.info(address);
-        return null;
+        return Result.success(map);
     }
 
 

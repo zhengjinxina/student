@@ -29,7 +29,8 @@ public class UploadFileController {
     @CrossOrigin
     @PostMapping(value = "/upload")
     public Result<?> upload(MultipartFile file) {
-        return uploadService.upload(file);
+        Result result = uploadService.upload(file);
+        return Result.success(result.getData());
     }
 
 }
