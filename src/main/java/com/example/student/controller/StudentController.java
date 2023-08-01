@@ -42,6 +42,9 @@ public class StudentController {
         if (StrUtil.isNotBlank(search)){
             wrapper.like(Student::getName, search);
         }
+        File file = new File("/Users/longen/idea_workspace/企业微信202-3809.png");
+        Result result = AwsS3Utils.uploadFile(file);
+        System.out.println(result.getData());
         Page<Student> studentPage = studentMapper.selectPage(new Page<>(pageNum, pageSize),wrapper);
         return Result.success(studentPage);
     }

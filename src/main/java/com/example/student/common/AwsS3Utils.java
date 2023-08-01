@@ -14,16 +14,16 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
+
 import com.amazonaws.services.s3.model.PutObjectRequest;
 
-import lombok.Data;
+
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.entity.ContentType;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.multipart.MultipartFile;
+
 
 import java.io.File;
 import java.util.HashMap;
@@ -66,7 +66,7 @@ public class AwsS3Utils {
 
     @Value("${s3.file_bucket}")
     public void setFileBucket(String fileBucket) {
-    this.fileBucket = fileBucket;
+        this.fileBucket = fileBucket;
     }
 
     /*** 初始化生成AmazonS3 客户端配置** @return*/
@@ -84,7 +84,12 @@ public class AwsS3Utils {
     }
 
 
-
+    /**
+     * 文件上传方法
+     *
+     * @param file 文件
+     * @return 返回map含有地址、文件名称参数
+     */
     public static Result uploadFile(File file) {
         String fileName = file.getName();
         if (fileName == null) {
@@ -92,8 +97,8 @@ public class AwsS3Utils {
             return Result.error("500", "传入的文件名不能为空");
         }
         if (!validateFileName(fileName)) {
-            log.error("文件名应仅包含汉字、字母、数字、下划线和点号");
-            return Result.error("500", "文件名应仅包含汉字、字母、数字、下划线和点号");
+            log.error("文件名应仅包含汉字、字母、数字、下划线、横线和点号");
+            return Result.error("500", "文件名应仅包含汉字、字母、数字、下划线、横线和点号");
         }
 
         String key = System.currentTimeMillis() + fileName;
@@ -101,7 +106,7 @@ public class AwsS3Utils {
 
         try {
             //设置文件访问权限（可读）
-            s3.putObject(new PutObjectRequest(fileBucket,key,file).withCannedAcl(CannedAccessControlList.valueOf(CannedAccessControlList.PublicRead.name())));
+            s3.putObject(new PutObjectRequest(fileBucket, key, file).withCannedAcl(CannedAccessControlList.valueOf(CannedAccessControlList.PublicRead.name())));
         } catch (AmazonServiceException e) {
             e.printStackTrace();
             System.exit(1);
@@ -123,7 +128,7 @@ public class AwsS3Utils {
      * @return 返回true表示符合要求
      */
     private static boolean validateFileName(String fileName) {
-        String regex = "^[a-zA-Z0-9_\\u4e00-\\u9fa5_\\.]+$";
+        String regex = "^[a-zA-Z0-9_\\u4e00-\\u9fa5_\\.-]+$";
         return fileName.matches(regex);
     }
 
